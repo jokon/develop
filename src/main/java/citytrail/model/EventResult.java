@@ -4,6 +4,11 @@ package citytrail.model;
  * Created by jaok on 2017-02-20.
  */
 public class EventResult {
+
+    public static final Integer LEGIT_COLUMN_COUNT = 9;
+    public static final Integer COLUMN_NUMBER = 1;
+    public static final Integer COLUMN_PLACE = 0;
+
     private Integer place;
     private Competitor competitor;
 

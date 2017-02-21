@@ -23,7 +23,7 @@ public enum City {
 
     City(int firstSingleEventId) {
         int next = 0;
-        for (int i = firstSingleEventId; i < firstSingleEventId + 6; i ++) {
+        for (int i = firstSingleEventId; i < firstSingleEventId + GeneralResult.EVENT_COUNT; i ++) {
             eventIds.add(firstSingleEventId + next++);
         }
     }

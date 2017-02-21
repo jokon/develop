@@ -1,5 +1,6 @@
 package citytrail.model;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -8,6 +9,20 @@ import java.util.List;
  * Created by jaok on 2017-02-20.
  */
 public class GeneralResult implements Comparable<GeneralResult> {
+
+    public static final Integer EVENT_COUNT = 6;
+    public static final Integer QUALIFIED_EVENT_THRESHOLD = 4;
+
+
+    public static final Integer LEGIT_COLUMN_COUNT = 15;
+    public static final Integer COLUMN_FIRST_NAME = 2;
+    public static final Integer COLUMN_LAST_NAME = 3;
+    public static final Integer COLUMN_CATEGORY = 7;
+    public static final Integer COLUMN_NUMBER = 1;
+    public static final Integer COLUMN_EVENT_COUNT = 14;
+
+    public static final Integer[] COLUMNS_EVENT_RESULTS = {8,9,10,11,12,13};
+
     private Competitor competitor;
     private List<Integer> places;
 
@@ -35,7 +50,7 @@ public class GeneralResult implements Comparable<GeneralResult> {
                 return o1.compareTo(o2);
             }
         });
-        int sum = places.subList(0, places.size() > 3 ? 4 : places.size()).stream().mapToInt(Integer::intValue).sum();
+        int sum = places.subList(0, places.size() >= QUALIFIED_EVENT_THRESHOLD ? QUALIFIED_EVENT_THRESHOLD : places.size()).stream().mapToInt(Integer::intValue).sum();
 
         return sum;
     }
@@ -61,7 +76,7 @@ public class GeneralResult implements Comparable<GeneralResult> {
         Integer thisPointCount = getPoinstCount();
         Integer otherPointCount = o.getPoinstCount();
 
-        if (thisEventCount < 4 || otherEventCount < 4) {
+        if (thisEventCount < QUALIFIED_EVENT_THRESHOLD || otherEventCount < QUALIFIED_EVENT_THRESHOLD) {
             if (thisEventCount == otherEventCount) {
                 return thisPointCount.compareTo(otherPointCount);
             } else {

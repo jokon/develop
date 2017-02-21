@@ -2,6 +2,7 @@ package citytrail;
 
 import citytrail.model.City;
 import citytrail.model.Competitor;
+import citytrail.model.EventResult;
 import citytrail.model.GeneralResult;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -65,28 +66,25 @@ public class Main {
 
         Elements tables = doc.getElementsByClass("main-scores-table");
 
-        if (tables.isEmpty())
-            return generalResults.values();
+        if (! tables.isEmpty()) {
+            Element table = tables.get(0);
+            Elements rawResults = table.select("tr");
 
-        Element table = tables.get(0);
+            for (Element rawResult : rawResults) {
+                Elements rawRow = rawResult.select("td");
 
-        Elements rawResults = table.select("tr");
+                if (rawRow.size() > EventResult.LEGIT_COLUMN_COUNT) {
+                    try {
+                        Integer number = getIntValueFrom(rawRow, EventResult.COLUMN_NUMBER);
+                        Integer place = getIntValueFrom(rawRow, EventResult.COLUMN_PLACE);
 
-        for (Element rawResult : rawResults) {
-
-            Elements rawRow = rawResult.select("td");
-
-            if (rawRow.size() > 9) {
-                try {
-                    Integer number = getIntValueFrom(rawRow, 1);
-                    Integer place = getIntValueFrom(rawRow, 0);
-
-                    GeneralResult generalResult = generalResults.get(number);
-                    if (generalResult != null) {
-                        generalResult.addPlace(place);
+                        GeneralResult generalResult = generalResults.get(number);
+                        if (generalResult != null) {
+                            generalResult.addPlace(place);
+                        }
+                    } catch (NumberFormatException ex) {
+                        ex.printStackTrace();
                     }
-                } catch (NumberFormatException ex) {
-                    ex.printStackTrace();
                 }
             }
         }
@@ -113,17 +111,18 @@ public class Main {
             for (Element rawResult : rawResults) {
                 Elements rawCompetitors = rawResult.select("td");
 
-                if (rawCompetitors.size() >= 15) {
-                    String firstName = rawCompetitors.get(2).text();
-                    String lastName = rawCompetitors.get(3).text();
-                    String category = rawCompetitors.get(7).text();
+                if (rawCompetitors.size() >= GeneralResult.LEGIT_COLUMN_COUNT) {
+                    String firstName = rawCompetitors.get(GeneralResult.COLUMN_FIRST_NAME).text();
+                    String lastName = rawCompetitors.get(GeneralResult.COLUMN_LAST_NAME).text();
+                    String category = rawCompetitors.get(GeneralResult.COLUMN_CATEGORY).text();
 
-                    Integer number = Integer.parseInt(rawCompetitors.get(1).text());
-                    Integer eventCount = Integer.parseInt(rawCompetitors.get(14).text());
+                    Integer number = Integer.parseInt(rawCompetitors.get(GeneralResult.COLUMN_NUMBER).text());
+                    Integer eventCount = Integer.parseInt(rawCompetitors.get(GeneralResult.COLUMN_EVENT_COUNT).text());
 
                     List<Integer> places = new ArrayList<>();
-                    for (int i = 8; i <= 13; i++) {
-                        addPlaceToListIfExist(places, rawCompetitors.get(i).text());
+
+                    for (Integer resultColumn : GeneralResult.COLUMNS_EVENT_RESULTS) {
+                        addPlaceToListIfExist(places, rawCompetitors.get(resultColumn).text());
                     }
 
                     Competitor competitor = new Competitor(firstName, lastName, number, category);
@@ -145,7 +144,6 @@ public class Main {
                 places.add(Integer.parseInt(place));
             }
         } catch (NumberFormatException ex) {
-
             ex.printStackTrace();
         }
     }
