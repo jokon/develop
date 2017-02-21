@@ -5,6 +5,9 @@ package citytrail.model;
  */
 public class EventResult {
 
+
+    public static final String RESULT_TABLE_HTML_CLASS_NAME = "main-scores-table";
+
     public static final Integer LEGIT_COLUMN_COUNT = 9;
     public static final Integer COLUMN_NUMBER = 1;
     public static final Integer COLUMN_PLACE = 0;

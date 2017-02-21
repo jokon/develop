@@ -10,6 +10,8 @@ import java.util.List;
  */
 public class GeneralResult implements Comparable<GeneralResult> {
 
+    public static final String RESULT_TABLE_HTML_CLASS_NAME = "main-scores-table";
+
     public static final Integer EVENT_COUNT = 6;
     public static final Integer QUALIFIED_EVENT_THRESHOLD = 4;
 
@@ -31,6 +33,17 @@ public class GeneralResult implements Comparable<GeneralResult> {
         this.places = places;
     }
 
+    public Integer getPoinstCount() {
+        Collections.sort(places);
+        int sum = places.subList(0, places.size() >= QUALIFIED_EVENT_THRESHOLD ? QUALIFIED_EVENT_THRESHOLD : places.size()).stream().mapToInt(Integer::intValue).sum();
+
+        return sum;
+    }
+
+    public Integer getEventCount() {
+        return places.size();
+    }
+
     public Competitor getCompetitor() {
         return competitor;
     }
@@ -39,28 +52,16 @@ public class GeneralResult implements Comparable<GeneralResult> {
         this.competitor = competitor;
     }
 
-    public Integer getEventCount() {
-        return places.size();
-    }
-
-    public Integer getPoinstCount() {
-        Collections.sort(places, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o1.compareTo(o2);
-            }
-        });
-        int sum = places.subList(0, places.size() >= QUALIFIED_EVENT_THRESHOLD ? QUALIFIED_EVENT_THRESHOLD : places.size()).stream().mapToInt(Integer::intValue).sum();
-
-        return sum;
-    }
-
     public List<Integer> getPlaces() {
         return places;
     }
 
     public void setPlaces(List<Integer> places) {
         this.places = places;
+    }
+
+    public void addPlace(Integer place) {
+        places.add(place);
     }
 
     @Override
@@ -85,10 +86,5 @@ public class GeneralResult implements Comparable<GeneralResult> {
         } else {
             return thisPointCount.compareTo(otherPointCount);
         }
-
-    }
-
-    public void addPlace(Integer place) {
-        places.add(place);
     }
 }

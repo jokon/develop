@@ -17,8 +17,11 @@ import java.util.*;
  */
 public class Main {
 
-    static String GENERAL_RESULTS_URL = "http://citytrail.pl/zawody/klasyfikacja_bg/miasto/%s";
-    static String SINGLE_EVENT_RESULT_URL = "http://citytrail.pl/zawody/wyniki/miasto/%s/id/%s";
+    static final String GENERAL_RESULTS_URL = "http://citytrail.pl/zawody/klasyfikacja_bg/miasto/%s";
+    static final String SINGLE_EVENT_RESULT_URL = "http://citytrail.pl/zawody/wyniki/miasto/%s/id/%s";
+    static final String FILE_RESULT_TEMPLATE = "results/%s.txt";
+    static final String HTML_ROW_MARK = "tr";
+    static final String HTML_COLUMN_MARK = "td";
 
     public static void main (String[] args) throws IOException {
         List<GeneralResult> globalResults = new ArrayList<>();
@@ -51,7 +54,7 @@ public class Main {
 
     public static void printResults(List<GeneralResult> results, String fileName) {
         try {
-            PrintWriter writer = new PrintWriter("results/" + fileName + ".txt" , "UTF-8");
+            PrintWriter writer = new PrintWriter(String.format(FILE_RESULT_TEMPLATE, fileName) , "UTF-8");
             for (int i = 0; i < results.size(); i++) {
                 writer.println((i + 1) + ". " + results.get(i));
             }
@@ -64,14 +67,14 @@ public class Main {
     private static Collection<GeneralResult> updateGeneralResultsBySingleResult(Map<Integer, GeneralResult> generalResults, String url) throws IOException {
         Document doc = Jsoup.connect(url).get();
 
-        Elements tables = doc.getElementsByClass("main-scores-table");
+        Elements tables = doc.getElementsByClass(EventResult.RESULT_TABLE_HTML_CLASS_NAME);
 
         if (! tables.isEmpty()) {
             Element table = tables.get(0);
-            Elements rawResults = table.select("tr");
+            Elements rawResults = table.select(HTML_ROW_MARK);
 
             for (Element rawResult : rawResults) {
-                Elements rawRow = rawResult.select("td");
+                Elements rawRow = rawResult.select(HTML_COLUMN_MARK);
 
                 if (rawRow.size() > EventResult.LEGIT_COLUMN_COUNT) {
                     try {
@@ -102,14 +105,14 @@ public class Main {
         Map<Integer, GeneralResult> results = new HashMap<>();
 
         Document doc = Jsoup.connect(url).get();
-        Elements tables = doc.getElementsByClass("main-scores-table");
+        Elements tables = doc.getElementsByClass(GeneralResult.RESULT_TABLE_HTML_CLASS_NAME);
 
 
         for (Element table : tables) {
-            Elements rawResults = table.select("tr");
+            Elements rawResults = table.select(HTML_ROW_MARK);
 
             for (Element rawResult : rawResults) {
-                Elements rawCompetitors = rawResult.select("td");
+                Elements rawCompetitors = rawResult.select(HTML_COLUMN_MARK);
 
                 if (rawCompetitors.size() >= GeneralResult.LEGIT_COLUMN_COUNT) {
                     String firstName = rawCompetitors.get(GeneralResult.COLUMN_FIRST_NAME).text();
