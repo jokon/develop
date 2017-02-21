@@ -95,10 +95,8 @@ public class Main {
     }
 
     private static Integer getIntValueFrom(Elements rawRow, int i) {
-
             String[] v = rawRow.get(i).text().split(" ");
             return Integer.parseInt(v[0]);
-
     }
 
     private static Map<Integer, GeneralResult> getGeneralResults(String url) throws IOException {
@@ -120,7 +118,6 @@ public class Main {
                     String category = rawCompetitors.get(GeneralResult.COLUMN_CATEGORY).text();
 
                     Integer number = Integer.parseInt(rawCompetitors.get(GeneralResult.COLUMN_NUMBER).text());
-                    Integer eventCount = Integer.parseInt(rawCompetitors.get(GeneralResult.COLUMN_EVENT_COUNT).text());
 
                     List<Integer> places = new ArrayList<>();
 
