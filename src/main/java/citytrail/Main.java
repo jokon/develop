@@ -8,8 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -18,16 +17,18 @@ import java.util.*;
 public class Main {
 
     static String GENERAL_RESULTS_URL = "http://citytrail.pl/zawody/klasyfikacja_bg/miasto/%s";
-    static String SINGLE_EVENT_RESULT = "http://citytrail.pl/zawody/wyniki/miasto/%s/id/%s";
+    static String SINGLE_EVENT_RESULT_URL = "http://citytrail.pl/zawody/wyniki/miasto/%s/id/%s";
 
     public static void main (String[] args) throws IOException {
         List<GeneralResult> globalResults = new ArrayList<>();
 
+
+        System.out.println("-----------|");
+
         for (City city : City.values()) {
-            System.out.println(String.format("\n\n ---- %s ---- \n", city.name().substring(0,1) + city.name().substring(1).toLowerCase()));
 
             String generalResultsUrl = String.format(GENERAL_RESULTS_URL, city.getName());
-            String eventResultUrl = String.format(SINGLE_EVENT_RESULT, city.getName(), city.getEventId(4));
+            String eventResultUrl = String.format(SINGLE_EVENT_RESULT_URL, city.getName(), city.getEventId(4));
 
             Map<Integer, GeneralResult> generalResults = getGeneralResults(generalResultsUrl);
             Collection<GeneralResult> updatedGeneralResults = updateGeneralResultsBySingleResult(generalResults, eventResultUrl);
@@ -38,22 +39,24 @@ public class Main {
             printResults(r, city.getName());
 
             globalResults.addAll(r);
+
+            System.out.print("-");
         }
 
-        System.out.println(String.format("\n\n ---- %s ---- \n", "GLOBALNE"));
         Collections.sort(globalResults);
         printResults(globalResults, "global");
+        System.out.print("-|");
     }
 
     public static void printResults(List<GeneralResult> results, String fileName) {
         try {
-            PrintWriter writer = new PrintWriter(fileName + ".txt" , "UTF-8");
+            PrintWriter writer = new PrintWriter("results/" + fileName + ".txt" , "UTF-8");
             for (int i = 0; i < results.size(); i++) {
                 writer.println((i + 1) + ". " + results.get(i));
             }
             writer.close();
         } catch (IOException ex) {
-
+            ex.printStackTrace();
         }
     }
 
@@ -75,19 +78,26 @@ public class Main {
 
             if (rawRow.size() > 9) {
                 try {
-                    Integer number = Integer.parseInt(rawRow.get(1).text());
-                    Integer place = Integer.parseInt(rawRow.get(0).text());
+                    Integer number = getIntValueFrom(rawRow, 1);
+                    Integer place = getIntValueFrom(rawRow, 0);
 
                     GeneralResult generalResult = generalResults.get(number);
                     if (generalResult != null) {
                         generalResult.addPlace(place);
                     }
                 } catch (NumberFormatException ex) {
-
+                    ex.printStackTrace();
                 }
             }
         }
         return generalResults.values();
+    }
+
+    private static Integer getIntValueFrom(Elements rawRow, int i) {
+
+            String[] v = rawRow.get(i).text().split(" ");
+            return Integer.parseInt(v[0]);
+
     }
 
     private static Map<Integer, GeneralResult> getGeneralResults(String url) throws IOException {
@@ -129,10 +139,14 @@ public class Main {
 
     private static void addPlaceToListIfExist(List<Integer> places, String text) {
         try {
-            String place = text.split(" ")[0];
-            places.add(Integer.parseInt(place));
+            String[] placeField = text.split(" ");
+            if (text.length() > 0 && placeField.length > 0) {
+                String place = placeField[0];
+                places.add(Integer.parseInt(place));
+            }
         } catch (NumberFormatException ex) {
 
+            ex.printStackTrace();
         }
     }
 }
