@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -55,8 +56,19 @@ public class Main {
     public static void printResults(List<GeneralResult> results, String fileName) {
         try {
             PrintWriter writer = new PrintWriter(String.format(FILE_RESULT_TEMPLATE, fileName) , "UTF-8");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+            String header = fileName.substring(0, 1).toUpperCase() + fileName.substring(1) + "\nwygnerowane: " + dateFormat.format(new Date());
+            writer.println(header + "\n");
+            Map<String, Integer> categoryRank = new HashMap<>();
             for (int i = 0; i < results.size(); i++) {
-                writer.println((i + 1) + ". " + results.get(i));
+                GeneralResult result = results.get(i);
+                String category = result.getCompetitor().getCategory();
+                if (!categoryRank.containsKey(category)) {
+                    categoryRank.put(category, 1);
+                } else {
+                    categoryRank.put(category, categoryRank.get(category) + 1);
+                }
+                writer.println((i + 1) + ". " + result + " w kategorii: " + categoryRank.get(category));
             }
             writer.close();
         } catch (IOException ex) {

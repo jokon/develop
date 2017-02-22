@@ -1,8 +1,6 @@
 package citytrail.model;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -33,7 +31,7 @@ public class GeneralResult implements Comparable<GeneralResult> {
         this.places = places;
     }
 
-    public Integer getPoinstCount() {
+    public Integer getPointCount() {
         Collections.sort(places);
         int sum = places.subList(0, places.size() >= QUALIFIED_EVENT_THRESHOLD ? QUALIFIED_EVENT_THRESHOLD : places.size()).stream().mapToInt(Integer::intValue).sum();
 
@@ -66,7 +64,7 @@ public class GeneralResult implements Comparable<GeneralResult> {
 
     @Override
     public String toString() {
-        return competitor + " [" + getEventCount() + " | " + getPoinstCount() + "]";
+        return competitor + " [" + getEventCount() + " | " + getPointCount() + "]";
     }
 
     @Override
@@ -74,8 +72,8 @@ public class GeneralResult implements Comparable<GeneralResult> {
         Integer thisEventCount = getEventCount();
         Integer otherEventCount = o.getEventCount();
 
-        Integer thisPointCount = getPoinstCount();
-        Integer otherPointCount = o.getPoinstCount();
+        Integer thisPointCount = getPointCount();
+        Integer otherPointCount = o.getPointCount();
 
         if (thisEventCount < QUALIFIED_EVENT_THRESHOLD || otherEventCount < QUALIFIED_EVENT_THRESHOLD) {
             if (thisEventCount == otherEventCount) {
